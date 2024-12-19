@@ -25,6 +25,42 @@ async function loadSettings() {
   $("#summary_input").val(extension_settings[extensionName].summary_input).trigger("input");
 }
 
+// This function summarizes the last message in the chat and sets it in the summary input field
+async function summarizeLastMessage() {
+  const context = getContext();
+  const chat = context.chat;
+
+  if (!chat || chat.length === 0) {
+      console.debug('No messages in chat');
+      return;
+  }
+
+  const lastMessage = chat[chat.length - 1];
+  if (!lastMessage || !lastMessage.mes) {
+      console.debug('Last message does not contain text');
+      return;
+  }
+
+  const prompt = substituteParamsExtended(extension_settings.memory.prompt, { words: extension_settings.memory.promptWords });
+  const skipWIAN = extension_settings.memory.SkipWIAN;
+
+  try {
+      inApiCall = true;
+      const summary = await generateQuietPrompt(prompt, false, skipWIAN, '', lastMessage.mes, extension_settings.memory.overrideResponseLength);
+      if (!summary) {
+          console.warn('Empty summary received');
+          return;
+      }
+      $("#summary_input").val(summary).trigger("input");
+      toastr.success('Summary generated successfully!', 'Success');
+  } catch (error) {
+      console.error('Failed to summarize message:', error);
+      toastr.error('Failed to summarize message', 'Error');
+  } finally {
+      inApiCall = false;
+  }
+}
+
 // This function is called when the extension settings are changed in the UI
 function onSummaryInput(event) {
   const value = $(event.target).val();
@@ -83,5 +119,5 @@ jQuery(async () => {
   $(".example-extension_block:first").after(getLastMessageButton);
 
   // Add event listener for the new button
-  $("#get_last_message_button").on("click", setLastMessageInSummaryInput);
+  $("#get_last_message_button").on("click", summarizeLastMessage); // Изменено здесь
 });
