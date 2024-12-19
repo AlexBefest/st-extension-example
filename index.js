@@ -13,7 +13,7 @@ const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 const extensionSettings = extension_settings[extensionName];
 const defaultSettings = {
     chunkSize: 20,
-    summaryPrompt: "[Pause your roleplay. Summarize the most important facts and events that have happened in the chat so far. Your response should include nothing but the summary. Don't repeat the characters' actions and lines, just talk in general terms. Talk about events in the past tense only. ANY COMMENTS AND INVENTATION OF NON-EXISTENT THINGS ARE PROHIBITED]",
+    summaryPrompt: "[Pause your roleplay. Summarize the most important facts and events that have happened in the chat so far. Your response should include nothing but the summary. Don't repeat the characters' actions and lines, just talk in general terms. Talk about events in the past tense only. ANY COMMENTS AND INVENTATION OF NON-EXISTENT THINGS ARE PROHIBITED. JUST MAKE A DETAILED REPRESENTATION, SUMMARY THE INFORMATION]",
 };
 
 // Loads the extension settings if they exist, otherwise initializes them to the defaults.
@@ -70,7 +70,7 @@ async function sendEntireChatToNeuralNetwork() {
 
   for (let i = 0; i < chat.length; i += chunkSize) {
     const chunk = chat.slice(i, i + chunkSize);
-    const prompt = `For your information, here is what happened in the story previously:\n${previousSummaries}\n\nAnd this is happening now, you should summarize this text below:\n${chunk.map(msg => msg.mes).join("\n\n")}\n\n${summaryPrompt}`;
+    const prompt = `For your information, here is what happened in the story previously DO NOT REPEAT THIS IN YOU ANSWER, JUST KEEP THAT IN MIND: \n##Start of previous plot##${previousSummaries}##End of previous plot##\n\nAnd this is happening now, you should summarize this text below: \n##Start of text to summarize ${chunk.map(msg => msg.mes).join("\n\n")} ##End of text to summarize\n\n${summaryPrompt}`;
 
     // Show notification before processing each chunk
     toastr.info(`Processing chunk ${i / chunkSize + 1} of ${Math.ceil(chat.length / chunkSize)}`, 'Starting processing');
