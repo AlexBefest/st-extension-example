@@ -13,7 +13,7 @@ const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 const extensionSettings = extension_settings[extensionName];
 const defaultSettings = {
     chunkSize: 20,
-    summaryPrompt: "[Conduct a summary of these messages in a fictional role-playing game and return a detailed retelling of the events in English. Do not quote the characters, just narrate from a third-person]",
+    summaryPrompt: "Conduct a summary of these messages in a fictional role-playing game and return a detailed retelling of the events in English. Do not quote the characters, just narrate from a third-person",
 };
 
 // Loads the extension settings if they exist, otherwise initializes them to the defaults.
@@ -69,7 +69,7 @@ async function sendEntireChatToNeuralNetwork() {
 
   for (let i = 0; i < chat.length; i += chunkSize) {
     const chunk = chat.slice(i, i + chunkSize);
-    const prompt = chunk.map(msg => msg.mes).join("\n\n") + "\n\n" + summaryPrompt;
+    const prompt = summaryPrompt + chunk.map(msg => msg.mes).join("\n\n");
 
     // Show notification before processing each chunk
     toastr.info(`Обработка чанка ${i / chunkSize + 1} из ${Math.ceil(chat.length / chunkSize)}`, 'Начало обработки');
@@ -92,24 +92,6 @@ async function sendEntireChatToNeuralNetwork() {
   $("#summary_input").val(finalSummary).trigger("input");
 }
 
-// Function to copy text to clipboard
-function copyToClipboard() {
-  const summaryText = $("#summary_input").val();
-  if (!summaryText) {
-    toastr.warning('Нет текста для копирования', 'Предупреждение');
-    return;
-  }
-
-  navigator.clipboard.writeText(summaryText)
-    .then(() => {
-      toastr.success('Текст скопирован в буфер обмена', 'Успех');
-    })
-    .catch(err => {
-      console.error('Could not copy text: ', err);
-      toastr.error('Не удалось скопировать текст', 'Ошибка');
-    });
-}
-
 // This function is called when the extension is loaded
 jQuery(async () => {
   // This is an example of loading HTML from a file
@@ -125,7 +107,6 @@ jQuery(async () => {
   $("#summary_input").on("input", onSummaryInput);
   $("#chunk_size_slider").on("input", onChunkSizeChange);
   $("#send_to_neural_network_button").on("click", sendEntireChatToNeuralNetwork);
-  $("#copy_to_clipboard_button").on("click", copyToClipboard); // Add event listener for copy button
 
   // Load settings when starting things up (if you have any)
   loadSettings();
