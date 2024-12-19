@@ -1,22 +1,30 @@
-<!-- You might want to add additional HTML elements to ST. 
-    It's good practice to separate it out from your code -->
-    <div class="example-extension-settings">
-        <div class="inline-drawer">
-            <div class="inline-drawer-toggle inline-drawer-header">
-                <b>Extension Example</b>
-                <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+<div id="my_summary_settings">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <div class="flex-container alignitemscenter margin0">
+                <b>Summarize</b>
             </div>
-            <div class="inline-drawer-content">
-                <div class="example-extension_block flex-container">
-                    <input id="my_button" class="menu_button" type="submit" value="Example Button" />
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+            <div id="my_summary_drawer_contents">
+                <label for="my_summary_prompt">Summary Prompt:</label>
+                <textarea id="my_summary_prompt" class="text_pole textarea_compact" rows="6" placeholder="This prompt will be sent to AI to request the summary generation. {{words}} will resolve to the 'Number of words' parameter."></textarea>
+
+                <label for="my_summary_words">Target summary length (words):</label>
+                <input id="my_summary_words" type="range" value="200" min="50" max="1000" step="25" />
+                <span id="my_summary_words_value">200</span>
+
+                <div class="memory_contents_controls">
+                    <div id="my_summary_force_summarize" class="menu_button menu_button_icon" title="Trigger a summary update right now.">
+                        <i class="fa-solid fa-database"></i>
+                        <span>Summarize now</span>
+                    </div>
                 </div>
-    
-                <div class="example-extension_block flex-container">
-                    <input id="example_setting" type="checkbox" />
-                    <label for="example_setting">This is an example</label>
-                </div>
-    
-                <hr class="sysHR" />
+
+                <label for="my_summary_contents">Current summary:</label>
+                <textarea id="my_summary_contents" class="text_pole textarea_compact" rows="6" placeholder="Summary will be generated here..."></textarea>
             </div>
         </div>
     </div>
+</div>
