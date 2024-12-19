@@ -13,7 +13,7 @@ const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 const extensionSettings = extension_settings[extensionName];
 const defaultSettings = {
     chunkSize: 20,
-    summaryPrompt: "Conduct a summary of these messages in a fictional role-playing game and return a detailed retelling of the events in English. Do not quote the characters, just narrate from a third-person",
+    summaryPrompt: "[Pause your roleplay. Summarize the most important facts and events that have happened in the chat so far. Your response should include nothing but the summary. Don't repeat the characters' actions and lines, just talk in general terms. Talk about events in the past tense only. ANY COMMENTS AND INVENTATION OF NON-EXISTENT THINGS ARE PROHIBITED]",
 };
 
 // Loads the extension settings if they exist, otherwise initializes them to the defaults.
@@ -66,10 +66,13 @@ async function sendEntireChatToNeuralNetwork() {
   const chunkSize = extension_settings[extensionName].chunkSize;
   const summaryPrompt = extension_settings[extensionName].summaryPrompt;
   let summaries = [];
+  let previousSummary = ""; // Переменная для хранения пересказа предыдущего чанка
 
   for (let i = 0; i < chat.length; i += chunkSize) {
     const chunk = chat.slice(i, i + chunkSize);
-    const prompt = chunk.map(msg => msg.mes).join("\n\n") + "\n\n" + summaryPrompt; // Изменение здесь
+    const promptPrefix = previousSummary ? `For your information, here is what happened in the story previously:\n${previousSummary}\n\n` : "";
+    const promptSuffix = `\n\n${summaryPrompt}`;
+    const prompt = promptPrefix + chunk.map(msg => msg.mes).join("\n\n") + promptSuffix;
 
     // Show notification before processing each chunk
     toastr.info(`Processing chunk ${i / chunkSize + 1} of ${Math.ceil(chat.length / chunkSize)}`, 'Starting processing');
@@ -78,6 +81,7 @@ async function sendEntireChatToNeuralNetwork() {
       const summary = await generateRaw(prompt, '', false, false, '', extension_settings.memory.overrideResponseLength);
       if (summary) {
         summaries.push(summary);
+        previousSummary = summary; // Сохраняем текущий пересказ для следующего чанка
       } else {
         console.warn('Empty summary received for chunk', i);
         toastr.warning('Empty summary received for chunk', 'Empty summary received for chunk');
