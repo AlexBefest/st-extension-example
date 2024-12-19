@@ -40,7 +40,7 @@ function onButtonClick() {
   // Let's make a popup appear with the checked setting
   toastr.info(
     `The checkbox is ${extension_settings[extensionName].example_setting ? "checked" : "not checked"}`,
-    "A popup appeared because you clicked the button!"
+    "A popup appeared because you clicked the button!!!!"
   );
 }
 
