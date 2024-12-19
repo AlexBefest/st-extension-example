@@ -64,19 +64,20 @@ async function sendEntireChatToNeuralNetwork() {
   }
 
   const chunkSize = extension_settings[extensionName].chunkSize;
-  const summaryPromptBase = extension_settings[extensionName].summaryPrompt;
-  let chunkSummaries = [];
+  const summaryPrompt = extension_settings[extensionName].summaryPrompt;
+  let summaries = [];
 
   for (let i = 0; i < chat.length; i += chunkSize) {
     const chunk = chat.slice(i, i + chunkSize);
-    const prompt = chunk.map(msg => msg.mes).join("\n\n") + "\n\n" + summaryPromptBase;
+    const prompt = chunk.map(msg => msg.mes).join("\n\n") + "\n\n" + summaryPrompt; // Изменение здесь
 
+    // Show notification before processing each chunk
     toastr.info(`Processing chunk ${i / chunkSize + 1} of ${Math.ceil(chat.length / chunkSize)}`, 'Starting processing');
 
     try {
       const summary = await generateRaw(prompt, '', false, false, '', extension_settings.memory.overrideResponseLength);
       if (summary) {
-        chunkSummaries.push(summary);
+        summaries.push(summary);
       } else {
         console.warn('Empty summary received for chunk', i);
         toastr.warning('Empty summary received for chunk', 'Empty summary received for chunk');
@@ -87,16 +88,8 @@ async function sendEntireChatToNeuralNetwork() {
     }
   }
 
-  if (chunkSummaries.length > 0) {
-    const combinedSummariesPrompt = `Combine the following separate summaries into one coherent and detailed retelling:\n\n${chunkSummaries.join("\n\n")}`;
-    try {
-      const finalSummary = await generateRaw(combinedSummariesPrompt, '', false, false, '', extension_settings.memory.overrideResponseLength);
-      $("#summary_input").val(finalSummary).trigger("input");
-    } catch (error) {
-      console.error('Error creating final summary:', error);
-      toastr.error(String(error), 'Error creating final summary');
-    }
-  }
+  const finalSummary = summaries.join("\n\n");
+  $("#summary_input").val(finalSummary).trigger("input");
 }
 
 // This function is called when the extension is loaded
