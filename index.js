@@ -13,7 +13,7 @@ const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 const extensionSettings = extension_settings[extensionName];
 const defaultSettings = {
     chunkSize: 20,
-    summaryPrompt: "Summarize the following messages:\n\n",
+    summaryPrompt: "Пожалуйста, сверьтесь с следующими сообщениями и предоставьте краткое резюме:\n\n",
 };
 
 // Loads the extension settings if they exist, otherwise initializes them to the defaults.
@@ -71,17 +71,20 @@ async function sendEntireChatToNeuralNetwork() {
     const chunk = chat.slice(i, i + chunkSize);
     const prompt = summaryPrompt + chunk.map(msg => msg.mes).join("\n\n");
 
+    // Show notification before processing each chunk
+    toastr.info(`Обработка чанка ${i / chunkSize + 1} из ${Math.ceil(chat.length / chunkSize)}`, 'Начало обработки');
+
     try {
       const summary = await generateRaw(prompt, '', false, false, '', extension_settings.memory.overrideResponseLength);
       if (summary) {
         summaries.push(summary);
       } else {
         console.warn('Empty summary received for chunk', i);
-        toastr.warning('Empty summary received for chunk', 'Failed to summarize message');
+        toastr.warning('Пустое резюме получено для чанка', 'Ошибка при суммаризации сообщения');
       }
     } catch (error) {
       console.error('Error summarizing message:', error);
-      toastr.error(String(error), 'Failed to summarize message');
+      toastr.error(String(error), 'Ошибка при суммаризации сообщения');
     }
   }
 
