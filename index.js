@@ -69,10 +69,10 @@ async function sendEntireChatToNeuralNetwork() {
 
   for (let i = 0; i < chat.length; i += chunkSize) {
     const chunk = chat.slice(i, i + chunkSize);
-    const prompt = summaryPrompt + chunk.map(msg => msg.mes).join("\n\n");
+    const prompt = chunk.map(msg => msg.mes).join("\n\n") + "\n\n" + summaryPrompt; // Изменение здесь
 
     // Show notification before processing each chunk
-    toastr.info(`Обработка чанка ${i / chunkSize + 1} из ${Math.ceil(chat.length / chunkSize)}`, 'Начало обработки');
+    toastr.info(`Processing chunk ${i / chunkSize + 1} of ${Math.ceil(chat.length / chunkSize)}`, 'Starting processing');
 
     try {
       const summary = await generateRaw(prompt, '', false, false, '', extension_settings.memory.overrideResponseLength);
@@ -80,11 +80,11 @@ async function sendEntireChatToNeuralNetwork() {
         summaries.push(summary);
       } else {
         console.warn('Empty summary received for chunk', i);
-        toastr.warning('Пустое резюме получено для чанка', 'Ошибка при суммаризации сообщения');
+        toastr.warning('Empty summary received for chunk', 'Empty summary received for chunk');
       }
     } catch (error) {
       console.error('Error summarizing message:', error);
-      toastr.error(String(error), 'Ошибка при суммаризации сообщения');
+      toastr.error(String(error), 'Error summarizing message');
     }
   }
 
