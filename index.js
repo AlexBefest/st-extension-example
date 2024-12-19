@@ -12,7 +12,7 @@ const extensionName = "st-extension-example";
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 const extensionSettings = extension_settings[extensionName];
 const defaultSettings = {
-    chunk_size: 20,
+    chunkSize: 20,
 };
 
 // Loads the extension settings if they exist, otherwise initializes them to the defaults.
@@ -25,8 +25,8 @@ async function loadSettings() {
 
   // Updating settings in the UI
   $("#summary_input").val(extension_settings[extensionName].summary_input).trigger("input");
-  $("#chunk_size").val(extension_settings[extensionName].chunk_size).trigger("input");
-  $("#chunk_size_value").text(extension_settings[extensionName].chunk_size);
+  $("#chunk_size_slider").val(extension_settings[extensionName].chunkSize).trigger("input");
+  $("#chunk_size_value").text(extension_settings[extensionName].chunkSize);
 }
 
 // This function is called when the extension settings are changed in the UI
@@ -39,12 +39,12 @@ function onSummaryInput(event) {
 // This function is called when the chunk size slider is changed
 function onChunkSizeChange(event) {
   const value = parseInt($(event.target).val());
-  extension_settings[extensionName].chunk_size = value;
+  extension_settings[extensionName].chunkSize = value;
   $("#chunk_size_value").text(value);
   saveSettingsDebounced();
 }
 
-// This function sends the entire chat to the neural network in chunks and sets the response in the summary input field
+// This function sends the entire chat to the neural network in chunks of specified size and sets the response in the summary input field
 async function sendEntireChatToNeuralNetwork() {
   const context = getContext();
   const chat = context.chat;
@@ -54,7 +54,7 @@ async function sendEntireChatToNeuralNetwork() {
     return;
   }
 
-  const chunkSize = extension_settings[extensionName].chunk_size;
+  const chunkSize = extension_settings[extensionName].chunkSize;
   let summaries = [];
 
   for (let i = 0; i < chat.length; i += chunkSize) {
@@ -91,7 +91,7 @@ jQuery(async () => {
 
   // These are examples of listening for events
   $("#summary_input").on("input", onSummaryInput);
-  $("#chunk_size").on("input", onChunkSizeChange);
+  $("#chunk_size_slider").on("input", onChunkSizeChange);
   $("#send_to_neural_network_button").on("click", sendEntireChatToNeuralNetwork);
 
   // Load settings when starting things up (if you have any)

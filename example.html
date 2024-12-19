@@ -8,8 +8,8 @@
             </div>
             <div class="inline-drawer-content">
                 <div class="example-extension_block flex-container">
-                    <label for="chunk_size">Количество чанков:</label>
-                    <input type="range" id="chunk_size" class="chunk_size" min="1" max="50" value="20">
+                    <label for="chunk_size_slider">Количество сообщений в чанке:</label>
+                    <input type="range" id="chunk_size_slider" name="chunk_size_slider" min="1" max="50" value="20">
                     <span id="chunk_size_value">20</span>
                 </div>
     
@@ -20,9 +20,7 @@
     
                 <hr class="sysHR" />
     
-                <div class="example-extension_block flex-container">
-                    <button id="send_to_neural_network_button" class="menu_button">Send Entire Chat to Neural Network</button>
-                </div>
+                <button id="send_to_neural_network_button" class="menu_button">Send Entire Chat to Neural Network</button>
             </div>
         </div>
     </div>
