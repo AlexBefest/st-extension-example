@@ -6,7 +6,6 @@ import { extension_settings, getContext, loadExtensionSettings } from "../../../
 
 // You'll likely need to import some other functions from the main script
 import { saveSettingsDebounced } from "../../../../script.js";
-import { summarizeCallback } from "./memory/index.js"; // Импортируем функцию суммирования из memory/index.js
 
 // Keep track of where your extension is located, name should match repo name
 const extensionName = "st-extension-example";
@@ -44,8 +43,8 @@ function onSummarizeButtonClick() {
   );
 }
 
-// This function gets the last message from the chat and sends it to the summarization API
-async function summarizeLastMessage() {
+// This function gets the last message from the chat and sets it in the summary input field
+function setLastMessageInSummaryInput() {
   const context = getContext();
   const chat = context.chat;
 
@@ -56,13 +55,7 @@ async function summarizeLastMessage() {
 
   const lastMessage = chat[chat.length - 1];
   if (lastMessage && lastMessage.mes) {
-    try {
-      const summarizedText = await summarizeCallback({}, lastMessage.mes);
-      $("#summary_input").val(summarizedText).trigger("input");
-    } catch (error) {
-      console.error("Error summarizing message:", error);
-      toastr.error("Failed to summarize message", "Error");
-    }
+    $("#summary_input").val(lastMessage.mes).trigger("input");
   } else {
     console.debug('Last message does not contain text');
   }
@@ -85,10 +78,10 @@ jQuery(async () => {
   // Load settings when starting things up (if you have any)
   loadSettings();
 
-  // Add a button to get the last message and summarize it
-  const getLastMessageButton = $('<button id="get_last_message_button" class="menu_button">Summarize Last Message</button>');
+  // Add a button to get the last message
+  const getLastMessageButton = $('<button id="get_last_message_button" class="menu_button">Get Last Message</button>');
   $(".example-extension_block:first").after(getLastMessageButton);
 
   // Add event listener for the new button
-  $("#get_last_message_button").on("click", summarizeLastMessage);
+  $("#get_last_message_button").on("click", setLastMessageInSummaryInput);
 });
