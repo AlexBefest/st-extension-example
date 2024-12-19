@@ -5,7 +5,7 @@
 import { extension_settings, getContext, loadExtensionSettings } from "../../../extensions.js";
 
 // You'll likely need to import some other functions from the main script
-import { saveSettingsDebounced } from "../../../../script.js";
+import { saveSettingsDebounced, generateRaw } from "../../../../script.js";
 
 // Keep track of where your extension is located, name should match repo name
 const extensionName = "st-extension-example";
@@ -24,7 +24,6 @@ async function loadSettings() {
   // Updating settings in the UI
   $("#summary_input").val(extension_settings[extensionName].summary_input).trigger("input");
 }
-
 
 // This function is called when the extension settings are changed in the UI
 function onSummaryInput(event) {
@@ -62,6 +61,37 @@ function setLastMessageInSummaryInput() {
   }
 }
 
+// This function sends the last message to the neural network and sets the response in the summary input field
+async function sendLastMessageToNeuralNetwork() {
+  const context = getContext();
+  const chat = context.chat;
+
+  if (!chat || chat.length === 0) {
+    console.debug('No messages in chat');
+    return;
+  }
+
+  const lastMessage = chat[chat.length - 1];
+  if (!lastMessage || !lastMessage.mes) {
+    console.debug('Last message does not contain text');
+    return;
+  }
+
+  const prompt = "Summarize the following message:\n\n" + lastMessage.mes;
+  try {
+    const summary = await generateRaw(prompt, '', false, false, '', extension_settings.memory.overrideResponseLength);
+    if (summary) {
+      $("#summary_input").val(summary).trigger("input");
+    } else {
+      console.warn('Empty summary received');
+      toastr.warning('Empty summary received', 'Failed to summarize message');
+    }
+  } catch (error) {
+    console.error('Error summarizing message:', error);
+    toastr.error(String(error), 'Failed to summarize message');
+  }
+}
+
 // This function is called when the extension is loaded
 jQuery(async () => {
   // This is an example of loading HTML from a file
@@ -85,4 +115,11 @@ jQuery(async () => {
 
   // Add event listener for the new button
   $("#get_last_message_button").on("click", setLastMessageInSummaryInput);
+
+  // Add a button to send the last message to the neural network
+  const sendToNeuralNetworkButton = $('<button id="send_to_neural_network_button" class="menu_button">Send to Neural Network</button>');
+  getLastMessageButton.after(sendToNeuralNetworkButton);
+
+  // Add event listener for the new button
+  $("#send_to_neural_network_button").on("click", sendLastMessageToNeuralNetwork);
 });
