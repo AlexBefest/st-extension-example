@@ -95,6 +95,11 @@ async function sendEntireChatToNeuralNetwork() {
 // Function to copy text to clipboard
 function copyToClipboard() {
   const summaryText = $("#summary_input").val();
+  if (!summaryText) {
+    toastr.warning('Нет текста для копирования', 'Предупреждение');
+    return;
+  }
+
   navigator.clipboard.writeText(summaryText)
     .then(() => {
       toastr.success('Текст скопирован в буфер обмена', 'Успех');
