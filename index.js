@@ -14,7 +14,6 @@ const extensionSettings = extension_settings[extensionName];
 const defaultSettings = {};
 
 
- 
 // Loads the extension settings if they exist, otherwise initializes them to the defaults.
 async function loadSettings() {
   //Create the settings if they don't exist
@@ -24,30 +23,31 @@ async function loadSettings() {
   }
 
   // Updating settings in the UI
-  $("#example_setting").prop("checked", extension_settings[extensionName].example_setting).trigger("input");
+  $("#summary_input").val(extension_settings[extensionName].summary_input).trigger("input");
 }
 
 // This function is called when the extension settings are changed in the UI
-function onExampleInput(event) {
-  const value = Boolean($(event.target).prop("checked"));
-  extension_settings[extensionName].example_setting = value;
+function onSummaryInput(event) {
+  const value = $(event.target).val();
+  extension_settings[extensionName].summary_input = value;
   saveSettingsDebounced();
 }
 
 // This function is called when the button is clicked
-function onButtonClick() {
+function onSummarizeButtonClick() {
   // You can do whatever you want here
-  // Let's make a popup appear with the checked setting
+  // Let's make a popup appear with the summary text
+  const summaryText = $("#summary_input").val();
   toastr.info(
-    `The checkbox is ${extension_settings[extensionName].example_setting ? "checked" : "not checked"}`,
-    "A popup appeared because you clicked the button!!!!"
+    `Summary: ${summaryText}`,
+    "A popup appeared because you clicked the Summarize button!!!!"
   );
 }
 
 // This function is called when the extension is loaded
 jQuery(async () => {
   // This is an example of loading HTML from a file
-  const settingsHtml = await $.get(`${extensionFolderPath}/example1.html`);
+  const settingsHtml = await $.get(`${extensionFolderPath}/example.html`);
 
   // Append settingsHtml to extensions_settings
   // extension_settings and extensions_settings2 are the left and right columns of the settings menu
@@ -55,8 +55,8 @@ jQuery(async () => {
   $("#extensions_settings").append(settingsHtml);
 
   // These are examples of listening for events
-  $("#my_button").on("click", onButtonClick);
-  $("#example_setting").on("input", onExampleInput);
+  $("#summarize_button").on("click", onSummarizeButtonClick);
+  $("#summary_input").on("input", onSummaryInput);
 
   // Load settings when starting things up (if you have any)
   loadSettings();

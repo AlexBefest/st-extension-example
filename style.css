@@ -1,1 +1,6 @@
-/* All style elements for your extension go here */
+/* All style elements for your extension go here *//* All style elements for your extension go here */
+.summary_input {
+    width: 100%;
+    height: 100px;
+    resize: vertical;
+}
