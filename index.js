@@ -61,8 +61,8 @@ function setLastMessageInSummaryInput() {
   }
 }
 
-// This function sends the last message to the neural network and sets the response in the summary input field
-async function sendLastMessageToNeuralNetwork() {
+// This function sends the entire chat to the neural network in chunks of 20 messages and sets the response in the summary input field
+async function sendEntireChatToNeuralNetwork() {
   const context = getContext();
   const chat = context.chat;
 
@@ -71,25 +71,29 @@ async function sendLastMessageToNeuralNetwork() {
     return;
   }
 
-  const lastMessage = chat[chat.length - 1];
-  if (!lastMessage || !lastMessage.mes) {
-    console.debug('Last message does not contain text');
-    return;
+  const chunkSize = 20;
+  let summaries = [];
+
+  for (let i = 0; i < chat.length; i += chunkSize) {
+    const chunk = chat.slice(i, i + chunkSize);
+    const prompt = "Summarize the following messages:\n\n" + chunk.map(msg => msg.mes).join("\n\n");
+
+    try {
+      const summary = await generateRaw(prompt, '', false, false, '', extension_settings.memory.overrideResponseLength);
+      if (summary) {
+        summaries.push(summary);
+      } else {
+        console.warn('Empty summary received for chunk', i);
+        toastr.warning('Empty summary received for chunk', 'Failed to summarize message');
+      }
+    } catch (error) {
+      console.error('Error summarizing message:', error);
+      toastr.error(String(error), 'Failed to summarize message');
+    }
   }
 
-  const prompt = "Summarize the following message:\n\n" + lastMessage.mes;
-  try {
-    const summary = await generateRaw(prompt, '', false, false, '', extension_settings.memory.overrideResponseLength);
-    if (summary) {
-      $("#summary_input").val(summary).trigger("input");
-    } else {
-      console.warn('Empty summary received');
-      toastr.warning('Empty summary received', 'Failed to summarize message');
-    }
-  } catch (error) {
-    console.error('Error summarizing message:', error);
-    toastr.error(String(error), 'Failed to summarize message');
-  }
+  const finalSummary = summaries.join("\n\n");
+  $("#summary_input").val(finalSummary).trigger("input");
 }
 
 // This function is called when the extension is loaded
@@ -116,10 +120,10 @@ jQuery(async () => {
   // Add event listener for the new button
   $("#get_last_message_button").on("click", setLastMessageInSummaryInput);
 
-  // Add a button to send the last message to the neural network
-  const sendToNeuralNetworkButton = $('<button id="send_to_neural_network_button" class="menu_button">Send to Neural Network</button>');
+  // Add a button to send the entire chat to the neural network
+  const sendToNeuralNetworkButton = $('<button id="send_to_neural_network_button" class="menu_button">Send Entire Chat to Neural Network</button>');
   getLastMessageButton.after(sendToNeuralNetworkButton);
 
   // Add event listener for the new button
-  $("#send_to_neural_network_button").on("click", sendLastMessageToNeuralNetwork);
+  $("#send_to_neural_network_button").on("click", sendEntireChatToNeuralNetwork);
 });
