@@ -1,11 +1,11 @@
 {
-    "display_name": "My Summary Extension",
+    "display_name": "Name Displayed in SillyTavern",
     "loading_order": 9,
     "requires": [],
     "optional": [],
     "js": "index.js",
     "css": "style.css",
-    "author": "YourNameHere",
+    "author": "yourNameHere",
     "version": "1.0.0",
-    "homePage": "https://github.com/AlexBefest/st-extension-example"
+    "homePage": "yourUrlHere"
 }
