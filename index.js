@@ -66,13 +66,11 @@ async function sendEntireChatToNeuralNetwork() {
   const chunkSize = extension_settings[extensionName].chunkSize;
   const summaryPrompt = extension_settings[extensionName].summaryPrompt;
   let summaries = [];
-  let previousSummary = ""; // Переменная для хранения пересказа предыдущего чанка
+  let previousSummaries = '';
 
   for (let i = 0; i < chat.length; i += chunkSize) {
     const chunk = chat.slice(i, i + chunkSize);
-    const promptPrefix = previousSummary ? `For your information, here is what happened in the story previously:\n${previousSummary}\n\n` : "";
-    const promptSuffix = `\n\n${summaryPrompt}`;
-    const prompt = promptPrefix + chunk.map(msg => msg.mes).join("\n\n") + promptSuffix;
+    const prompt = `For your information, here is what happened in the story previously:\n${previousSummaries}\n\nAnd this is happening now, you should summarize this text below:\n${chunk.map(msg => msg.mes).join("\n\n")}\n\n${summaryPrompt}`;
 
     // Show notification before processing each chunk
     toastr.info(`Processing chunk ${i / chunkSize + 1} of ${Math.ceil(chat.length / chunkSize)}`, 'Starting processing');
@@ -81,7 +79,7 @@ async function sendEntireChatToNeuralNetwork() {
       const summary = await generateRaw(prompt, '', false, false, '', extension_settings.memory.overrideResponseLength);
       if (summary) {
         summaries.push(summary);
-        previousSummary = summary; // Сохраняем текущий пересказ для следующего чанка
+        previousSummaries += `\n\n${summary}`;
       } else {
         console.warn('Empty summary received for chunk', i);
         toastr.warning('Empty summary received for chunk', 'Empty summary received for chunk');
