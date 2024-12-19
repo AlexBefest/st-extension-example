@@ -82,7 +82,7 @@ async function sendEntireChatToNeuralNetwork() {
         previousSummaries += `\n\n${summary}`;
       } else {
         console.warn('Empty summary received for chunk', i);
-        toastr.warning('Empty summary received for chunk', 'Empty summary received for chunk');
+        toastr.warning('Empty summary received for chunk', 'Empty summary received для chunk');
       }
     } catch (error) {
       console.error('Error summarizing message:', error);
