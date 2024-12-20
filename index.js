@@ -13,7 +13,7 @@ const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 const extensionSettings = extension_settings[extensionName];
 const defaultSettings = {
     chunkSize: 20,
-    summaryPrompt: "[Pause your roleplay. Summarize the most important facts and events that have happened in the chat so far. Your response should include nothing but the summary. Don't repeat the characters' actions and lines, just talk in general terms. Talk about events in the past tense only. ANY COMMENTS AND INVENTATION OF NON-EXISTENT THINGS ARE PROHIBITED. JUST MAKE A DETAILED REPRESENTATION, SUMMARY THE INFORMATION. THE SUMMARY SHOULD BE AT LEAST TWO THOUSAND WORDS]",
+    summaryPrompt: "[Pause your roleplay. Summarize the most important facts and events that have happened in the chat so far. Your response should include nothing but the summary. Don't repeat the characters' actions and lines, just talk in general terms. Talk about events in the past tense only. ANY COMMENTS AND INVENTATION OF NON-EXISTENT THINGS ARE PROHIBITED. JUST MAKE A DETAILED REPRESENTATION, SUMMARY THE INFORMATION]",
 };
 
 // Loads the extension settings if they exist, otherwise initializes them to the defaults.
